@@ -8,6 +8,139 @@
  * Updated and revised by MonsterGfx
  */
 
+/**
+ * The MPD server interface
+ * 
+ * The following are commands to implement:
+ * 
+ * Querying MPD's status
+ * 
+ * - status - Reports the current status of the player and the volume level.
+ * - currentsong - Displays the song info of the current song (same song that is identified in status).
+ * @todo clearerror
+ * @todo idle
+ * @todo stats
+ * 
+ * 
+ * Playback options
+ * 
+ * @todo consume
+ * @todo crossfade
+ * @todo mixrampdb
+ * @todo mixrampdelay
+ * @todo random
+ * @todo repeat
+ * @todo setvol
+ * @todo single
+ * @todo replay_gain_mode
+ * @todo replay_gain_status
+ * 
+ * 
+ * Controlling playback
+ * 
+ * @todo next
+ * @todo pause
+ * @todo play
+ * @todo playid
+ * @todo previous
+ * @todo seek
+ * @todo seekid
+ * @todo seekcur
+ * @todo stop
+ * 
+ * 
+ * The current playlist
+ * 
+ * - add {URI} - Adds the file URI to the playlist (directories add recursively). URI can also be a single file.
+ * - clear - Clears the current playlist.
+ * - move [{FROM} | {START:END}] {TO} - Moves the song at FROM or range of songs at START:END to TO in the playlist.
+ * @todo addid
+ * @todo delete
+ * @todo deleteid
+ * @todo moveid
+ * @todo playlist
+ * @todo playlistfind
+ * @todo playlistid
+ * @todo playlistinfo
+ * @todo playlistsearch
+ * @todo plchanges
+ * @todo plchangesposid
+ * @todo prio
+ * @todo prioid
+ * @todo shuffle
+ * @todo swap
+ * @todo swapid
+ * 
+ * 
+ * Stored playlists
+ * 
+ * @todo listplaylist
+ * @todo listplaylistinfo
+ * @todo listplaylists
+ * @todo load
+ * @todo playlistadd
+ * @todo playlistclear
+ * @todo playlistdelete
+ * @todo playlistmove
+ * @todo rename
+ * @todo rm
+ * @todo save
+ * 
+ * The music database
+ * 
+ * @todo count
+ * @todo find
+ * @todo findadd
+ * @todo list
+ * @todo listall
+ * @todo listallinfo
+ * @todo lsinfo
+ * @todo search
+ * @todo searchadd
+ * @todo searchaddpl
+ * @todo update
+ * @todo rescan
+ * 
+ * 
+ * Stickers
+ * 
+ * @todo sticker
+ * 
+ * 
+ * Connection settings
+ * 
+ * @todo close
+ * @todo kill
+ * @todo password
+ * @todo ping
+ * 
+ * 
+ * Audio output devices
+ * 
+ * @todo disableoutput
+ * @todo enableoutput
+ * @todo outputs
+ * 
+ * 
+ * Reflection
+ * 
+ * @todo config
+ * @todo commands
+ * @todo notcommands
+ * @todo tagtypes
+ * @todo urlhandlers
+ * @todo decoders
+ * 
+ * 
+ * Client to client
+ * 
+ * @todo subscribe
+ * @todo unsubscribe
+ * @todo channels
+ * @todo readmessages
+ * @todo sendmessage
+ * 
+ */
 class MPD {
 
 	/**
@@ -39,10 +172,11 @@ class MPD {
 	public static function connect($pass = "", $host = "", $port = 6600, $refresh = 0)
 	{
 		// open the connection to the server
-		static::$fp = fsockopen($host, $port, $errno, $errstr, 30); //Connect-String
+		static::$fp = fsockopen($host, $port, $errno, $errstr, 30);
 
 		// check to see if we successfully connected
-		if(!static::$fp) {
+		if(!static::$fp)
+		{
 			// no connection
 			throw new MPDConnectionFailedException("$errstr ($errno)");
 		}
@@ -88,7 +222,7 @@ class MPD {
 
 				// is it an "ACK" (error) message? if so, the login failed
 				if(strncmp("ACK",$got,strlen("ACK"))==0)
-					throw new MPDLoginFailedException("Unable to log in. Incorrect password?");
+					throw new MPDLoginFailedException();
 			}
 		}
 	}
@@ -108,8 +242,6 @@ class MPD {
 	 * Our send method handles all commands and responses, you can use this
 	 * directly or the quick method wrappers below.
 	 * 
-	 * @todo rewrite this to use func_get_args (or whatever that function is called)
-	 * 
 	 * @param string $method 
 	 * The method (command) string
 	 * 
@@ -122,25 +254,26 @@ class MPD {
 	 * @return string
 	 * The response
 	 */
-	public static function send($method, $arg1="", $arg2="")
+	public static function send()
 	{
-		// format the command
-		if($arg1 != "" && $arg2 != "")
-		{
-			$command = "$method \"$arg1\" \"$arg2\"";
-		}
-		elseif($arg1 != "") {
-			$command = "$method \"$arg1\"";
-		}
-		else {
-			$command = $method;
-		}
+		// get the arguments
+		$args = func_get_args();
+
+		// the first argument is the method
+		$method = array_shift($args);
+
+		// wrap the remaining arguments in double quotes
+		array_walk($args, function(&$value, $key){ $value = '"'.$value.'"'; });
+
+		// build the command string
+		$command = trim($method.' '.implode(' ',$args));
 
 		// send the command to the server
 		fputs(static::$fp, "$command\n");
 
 		// keep looping while we're getting data
-		while(!feof(static::$fp)) {
+		while(!feof(static::$fp))
+		{
 			// get a line of data
 			$got =  fgets(static::$fp, 1024);
 
@@ -169,24 +302,39 @@ class MPD {
 
 	/**
 	 * Add a resource to the playlist
-	 *
+	 * 
+	 * add {URI} - Adds the file URI to the playlist (directories add
+	 * recursively). URI can also be a single file.
+	 * 
 	 * @param string $string 
 	 * The item to add
 	 *
 	 * @return array
 	 * The response from the server
 	 */
-	public static function add($string) {
-		return static::send("add",$string);
+	public static function add($string)
+	{
+		// validation
+		// the argument can be just about anything (I can't find a description
+		// of the URI), so I'm just going to make sure it's a non-empty scalar
+		// value
+		if(!$string || !is_scalar($string))
+			throw new MPDInvalidArgumentException("Add: invalid argument: $string");
+
+		// send the command
+		return static::send("add", $string);
 	}
 
 	/**
 	 * Request the server status
-	 *
+	 * 
+	 * Reports the current status of the player and the volume level.
+	 * 
 	 * @return array
 	 * The response from the server
 	 */
-	public static function status() {
+	public static function status()
+	{
 		return static::send("status");
 	}
 
@@ -196,22 +344,30 @@ class MPD {
 	 * @return array
 	 * The response from the server
 	 */
-	public static function clear() {
+	public static function clear()
+	{
 		return static::send("clear");
 	}
 
 	/**
 	 * Get the current song info
 	 * 
+	 * Displays the song info of the current song (same song that is identified
+	 * in status).
+	 * 
 	 * @return array
 	 * The response from the server
 	 */
-	public static function currentSong() {
+	public static function currentSong()
+	{
 		return static::send("currentsong");
 	}
 
 	/**
 	 * Move a song within the current playlist
+	 * 
+	 * move [{FROM} | {START:END}] {TO} - Moves the song at FROM or range of
+	 * songs at START:END to TO in the playlist.
 	 * 
 	 * @param string $from
 	 * The Song ID of the song to move
@@ -222,8 +378,21 @@ class MPD {
 	 * @return array
 	 * The response from the server
 	 */
-	public static function move($from,$to) {
-		return static::send("move", $from,$to);
+	public static function move($from, $to)
+	{
+		// validation
+
+		// $from must be either a single integer value (a playlist position) or
+		// a string describing a range (two integers separated by ':')
+		if(!preg_match('/^([0-9]+|[0-9]+\:[0-9]+)$/', trim($from)))
+			throw new MPDInvalidArgumentException("Move: invalid FROM value: $from");
+
+		// $to must be a single integer value
+		if(!is_numeric($to) || $to<0)
+			throw new MPDInvalidArgumentException("Move: invalid TO value: $to");
+
+		// send the command
+		return static::send("move", $from, $to);
 	}
 }
 
@@ -231,6 +400,8 @@ class MPD {
 class MPDConnectionFailedException extends \Exception {};
 
 class MPDLoginFailedException extends \Exception {};
+
+class MPDInvalidArgumentException extends \Exception {};
 
 
 
