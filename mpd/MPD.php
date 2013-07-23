@@ -1,4 +1,4 @@
-<?php namespace MPDWrapper;
+<?php namespace PHPMPDClient;
 /**
  * Created by Mutant Labs
  * User: mijahn
@@ -8,7 +8,7 @@
  * Updated and revised by MonsterGfx
  */
 
-class SimpleMPDWrapper {
+class MPD {
 
 	/**
 	 * The file pointer used for accessing the server
