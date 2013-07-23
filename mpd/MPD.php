@@ -120,7 +120,19 @@ class MPD {
 	 * @return string
 	 * The response
 	 */
+	public static function send()
 	{
+		// get the arguments
+		$args = func_get_args();
+
+		// the first argument is the method
+		$method = array_shift($args);
+
+		// wrap the remaining arguments in double quotes
+		array_walk($args, function(&$value, $key){ $value = '"'.$value.'"'; });
+
+		// build the command string
+		$command = trim($method.' '.implode(' ',$args));
 
 		// send the command to the server
 		fputs(static::$fp, "$command\n");
