@@ -11,6 +11,9 @@
     ],
     "require": {
     },
+    "require-dev": {
+        "raveren/kint": "dev-master"
+    },
     "autoload": {
         "psr-0": {
             "MPDWrapper": ""
