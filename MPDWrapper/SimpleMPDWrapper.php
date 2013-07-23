@@ -1,4 +1,4 @@
-<?php
+<?php namespace MPDWrapper;
 /**
  * Created by Mutant Labs
  * User: mijahn
@@ -6,7 +6,6 @@
  * Time: 11:44
  */
 
-namespace MPDWrapper;
 
 class SimpleMPDWrapper {
     private $fp;
