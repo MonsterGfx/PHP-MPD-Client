@@ -13,8 +13,8 @@ functionality.
 
 #Installing it in your project
 
-Right now, the only way is to download files & install them manually. I am going
-to set it up on http://packagist.org soon.
+Visit the project page at https://packagist.org/packages/monstergfx/php-mpd-client
+and install the package via Composer.
 
 
 Requirements
@@ -26,11 +26,16 @@ Requirements
 #SimpleMPDWrapper Class usage
 
 See http://www.musicpd.org/doc/protocol/ for the MPD protocol documentation.
-This class currently includes the following methods:
 
+You can submit an arbitrary command via the `MPD::send` method.
 
+There are also wrapper methods for several of the commands:
 
-
+- `MPD::add()`
+- `MPD::status()`
+- `MPD::clear()`
+- `MPD::currentSong()`
+- `MPD::move()`
 
 
 License
