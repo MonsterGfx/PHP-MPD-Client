@@ -2,10 +2,12 @@
 
 require_once "./vendor/autoload.php";
 
+use PHPMPDClient\MPD AS mpd;
+
 // instantiate a connection
 
-$mpd = new PHPMPDClient\MPD('', 'localhost');
+mpd::connect('', 'localhost');
 
-Kint::dump($mpd);
+Kint::dump(mpd::status());
 
-Kint::dump($mpd->status());
+mpd::disconnect();
