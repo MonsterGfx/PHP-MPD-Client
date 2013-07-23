@@ -13,15 +13,15 @@ class MPD {
 	/**
 	 * The file pointer used for accessing the server
 	 */
-	private $fp;
+	private static $fp = null;
 
 	/**
 	 * The response
 	 */
-	private $response;
+	private static $response;
 
 	/**
-	 * Construct the MPD wrapper object
+	 * Connect to the MPD server
 	 *
 	 * @param string $pass 
 	 * The password for the MPD server
@@ -36,31 +36,31 @@ class MPD {
 	 * It is not known what this is supposed to be. It's not referenced in the
 	 * code below.
 	 */
-	public function __construct($pass = "", $host = "", $port = 6600, $refresh = 0)
+	public static function connect($pass = "", $host = "", $port = 6600, $refresh = 0)
 	{
 		// open the connection to the server
-		$this->fp = fsockopen($host,$port,$errno,$errstr,30); //Connect-String
+		static::$fp = fsockopen($host, $port, $errno, $errstr, 30); //Connect-String
 
 		// check to see if we successfully connected
-		if(!$this->fp) {
+		if(!static::$fp) {
 			// no connection
-			throw new Exception("$errstr ($errno)");
+			throw new MPDConnectionFailedException("$errstr ($errno)");
 		}
 
 		// we did successfully connect
 
 		// keep reading from the connection while we're getting data
-		while(!feof($this->fp))
+		while(!feof(static::$fp))
 		{
 			// get a line from the stream
-			$got = fgets($this->fp,1024);
+			$got = fgets(static::$fp,1024);
 
 			// is the "MPD Ready" message? If so, leave the loop
 			if(strncmp("OK",$got,strlen("OK"))==0)
 				break;
 
 			// set the response value
-			$this->response = "$got<br>";
+			static::$response = "$got<br>";
 
 			// is it an "ACK" (error) message? if so, leave the loop
 			if(strncmp("ACK",$got,strlen("ACK"))==0)
@@ -71,26 +71,35 @@ class MPD {
 		if($pass != "")
 		{
 			// send the password
-			fputs($this->fp,"password \"$pass\"\n"); //Check Password
+			fputs(static::$fp,"password \"$pass\"\n"); //Check Password
 
 			// keep reading while we're getting data from the stream
-			while(!feof($this->fp))
+			while(!feof(static::$fp))
 			{
 				// get a line from the stream
-				$got = fgets($this->fp,1024);
+				$got = fgets(static::$fp,1024);
 
 				// is it the "Login OK" message? if so, leave the loop
 				if(strncmp("OK",$got,strlen("OK"))==0)
 					break;
 
 				// save the response string
-				$this->response = "$got<br>";
+				static::$response = "$got<br>";
 
 				// is it an "ACK" (error) message? if so, the login failed
 				if(strncmp("ACK",$got,strlen("ACK"))==0)
-					throw new Exception("Unable to log in. Incorrect password?");
+					throw new MPDLoginFailedException("Unable to log in. Incorrect password?");
 			}
 		}
+	}
+
+	/**
+	 * Disconnect from the server
+	 */
+	public static function disconnect()
+	{
+		if(static::$fp!==null)
+			fclose(static::$fp);
 	}
 
 	/**
@@ -113,9 +122,9 @@ class MPD {
 	 * @return string
 	 * The response
 	 */
-	public function send($method, $arg1="", $arg2="")
+	public static function send($method, $arg1="", $arg2="")
 	{
-		// format the comm
+		// format the command
 		if($arg1 != "" && $arg2 != "")
 		{
 			$command = "$method \"$arg1\" \"$arg2\"";
@@ -128,12 +137,12 @@ class MPD {
 		}
 
 		// send the command to the server
-		fputs($this->fp,"$command\n");
+		fputs(static::$fp, "$command\n");
 
 		// keep looping while we're getting data
-		while(!feof($this->fp)) {
+		while(!feof(static::$fp)) {
 			// get a line of data
-			$got =  fgets($this->fp,1024);
+			$got =  fgets(static::$fp, 1024);
 
 			// is the "OK" message? if so, leave the loop
 			if(strncmp("OK", $got, strlen("OK"))==0)
@@ -149,10 +158,9 @@ class MPD {
 
 		// build a response array
 		$sentResponse = array(
-			"response" => $this->response,
-			// @todo why is this here? it's just the last line of the response
-			"got" => $got,
-			"ret" => $ret
+			"response" => static::$response,
+			"status" => trim($got),
+			"values" => $ret
 		);
 
 		// return the response
@@ -168,8 +176,8 @@ class MPD {
 	 * @return array
 	 * The response from the server
 	 */
-	public function add($string) {
-		return $this->send("add",$string);
+	public static function add($string) {
+		return static::send("add",$string);
 	}
 
 	/**
@@ -178,8 +186,8 @@ class MPD {
 	 * @return array
 	 * The response from the server
 	 */
-	public function status() {
-		return $this->send("status");
+	public static function status() {
+		return static::send("status");
 	}
 
 	/**
@@ -188,8 +196,8 @@ class MPD {
 	 * @return array
 	 * The response from the server
 	 */
-	public function clear() {
-		return $this->send("clear");
+	public static function clear() {
+		return static::send("clear");
 	}
 
 	/**
@@ -198,8 +206,8 @@ class MPD {
 	 * @return array
 	 * The response from the server
 	 */
-	public function currentSong() {
-		return $this->send("currentsong");
+	public static function currentSong() {
+		return static::send("currentsong");
 	}
 
 	/**
@@ -214,7 +222,10 @@ class MPD {
 	 * @return array
 	 * The response from the server
 	 */
-	public function move($from,$to) {
-		return $this->send("move", $from,$to);
+	public static function move($from,$to) {
+		return static::send("move", $from,$to);
 	}
+}
+
+
 }
