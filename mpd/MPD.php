@@ -312,9 +312,17 @@ class MPD {
 	 * @return array
 	 * The response from the server
 	 */
-	public static function add($string) {
-		// @todo validation of parameters
-		return static::send("add",$string);
+	public static function add($string)
+	{
+		// validation
+		// the argument can be just about anything (I can't find a description
+		// of the URI), so I'm just going to make sure it's a non-empty scalar
+		// value
+		if(!$string || !is_scalar($string))
+			throw new MPDInvalidArgumentException("Add: invalid argument: $string");
+
+		// send the command
+		return static::send("add", $string);
 	}
 
 	/**
