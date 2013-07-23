@@ -1,147 +1,220 @@
-<?php
+<?php namespace MPDWrapper;
 /**
  * Created by Mutant Labs
  * User: mijahn
  * Date: 31/05/13
  * Time: 11:44
- * To change this template use File | Settings | File Templates.
+ * 
+ * Updated and revised by MonsterGfx
  */
 
-/*
-    SimpleMPDWrapper Class useage
-
-    // Construct a new PocketMp instance
-    // Required parameters: Password, MPD Server address, Port, Refresh interval
-    $mp = new PocketMP("","192.168.0.1",6600,0);
-
-    // Send a command using the send method:
-    echo json_encode($mp->send("add", "spotify:track:48mZ0CGCffjH49h5lAPTIe"));
-
-    // Or utilise the quick method wrappers
-    echo json_encode($mp->add("spotify:track:48mZ0CGCffjH49h5lAPTIe"));
-
-*/
-namespace MPDWrapper;
-
 class SimpleMPDWrapper {
-    private $fp;
-    private $response;
-    public function __construct($pass = "",$host = "",$port = 6600,$refresh = 0) {
 
-        if(!isset($srch)) {
+	/**
+	 * The file pointer used for accessing the server
+	 */
+	private $fp;
 
-        }
-        $this->fp = fsockopen($host,$port,$errno,$errstr,30); //Connect-String
-        if(!$this->fp) {
-            echo "$errstr ($errno)<br>\n"; //Can we connect?
-        }
-        else {
-            while(!feof($this->fp)) {
-                $got = fgets($this->fp,1024);
-                if(strncmp("OK",$got,strlen("OK"))==0) //MPD Ready...
-                break;
-                $this->response = "$got<br>";
-                if(strncmp("ACK",$got,strlen("ACK"))==0) //What"s going wrong?
-                break;
-            }
-            if($pass != "") { //Password needed?
-                fputs($this->fp,"password \"$pass\"\n"); //Check Password
-                while(!feof($this->fp)) {
-                    $got = fgets($this->fp,1024);
-                    if(strncmp("OK",$got,strlen("OK"))==0) { //Password OK
-                        #print "Login Succesful<br>\n";
-                        break;
-                    }
-                    $this->response = "$got<br>";
-                    if(strncmp("ACK",$got,strlen("ACK"))==0) //Password Wrong
-                    break;
-                    die("Wrong Password?");
-                }
-            }
-        }
+	/**
+	 * The response
+	 */
+	private $response;
 
-    }
+	/**
+	 * Construct the MPD wrapper object
+	 *
+	 * @param string $pass 
+	 * The password for the MPD server
+	 *
+	 * @param string $host 
+	 * The host name or IP address of the server
+	 *
+	 * @param int $port 
+	 * The port number via which to connect to the server
+	 *
+	 * @param int $refresh 
+	 * It is not known what this is supposed to be. It's not referenced in the
+	 * code below.
+	 */
+	public function __construct($pass = "", $host = "", $port = 6600, $refresh = 0)
+	{
+		// open the connection to the server
+		$this->fp = fsockopen($host,$port,$errno,$errstr,30); //Connect-String
 
-    /*
-     Our send method handles all commands and responses, you can use this directly or the quick method wrappers below
-    */
+		// check to see if we successfully connected
+		if(!$this->fp) {
+			// no connection
+			throw new Exception("$errstr ($errno)");
+		}
 
-    public function send($method,$arg1="",$arg2="") {
+		// we did successfully connect
 
-        // if we have a string, send it as well
-        if($arg1 != "" && $arg2 != "")
-        {
-            $command = "$method \"$arg1\" \"$arg2\"";
-        }
-        elseif($arg1 != "") {
-            $command = "$method \"$arg1\"";
-        }
-        else {
-            $command = $method;
-        }
+		// keep reading from the connection while we're getting data
+		while(!feof($this->fp))
+		{
+			// get a line from the stream
+			$got = fgets($this->fp,1024);
 
+			// is the "MPD Ready" message? If so, leave the loop
+			if(strncmp("OK",$got,strlen("OK"))==0)
+				break;
 
-        fputs($this->fp,"$command\n"); //Do desired action!
-        $c = 0;
-        while(!feof($this->fp)) {
-            $got =  fgets($this->fp,1024);
-            if(strncmp("OK",$got,strlen("OK"))==0)
-                break;
-            if(strncmp("ACK",$got,strlen("ACK"))==0)
-                break;
+			// set the response value
+			$this->response = "$got<br>";
 
-            $ret[$c]=$got;
-            $c++;
-        }
+			// is it an "ACK" (error) message? if so, leave the loop
+			if(strncmp("ACK",$got,strlen("ACK"))==0)
+				break;
+		}
 
-        $sentResponse = array(
-            "response" => $this->response,
-            "got" => $got,
-            "ret" => $ret
-        );
-        return $sentResponse;
+		// do we have a password to send?
+		if($pass != "")
+		{
+			// send the password
+			fputs($this->fp,"password \"$pass\"\n"); //Check Password
 
-    }
+			// keep reading while we're getting data from the stream
+			while(!feof($this->fp))
+			{
+				// get a line from the stream
+				$got = fgets($this->fp,1024);
 
-    /*
-    Quick method wrappers
+				// is it the "Login OK" message? if so, leave the loop
+				if(strncmp("OK",$got,strlen("OK"))==0)
+					break;
 
-    // Construct a new PocketMp instance
-    // Required parameters: Password, MPD Server address, Port, Refresh interval
-    $mp = new PocketMP("","192.168.0.1",6600,0);
+				// save the response string
+				$this->response = "$got<br>";
 
-    // Call a quick method
+				// is it an "ACK" (error) message? if so, the login failed
+				if(strncmp("ACK",$got,strlen("ACK"))==0)
+					throw new Exception("Unable to log in. Incorrect password?");
+			}
+		}
+	}
 
-    echo json_encode($mp->add("spotify:track:48mZ0CGCffjH49h5lAPTIe"));
+	/**
+	 * Send a command to the server
+	 *
+	 * Our send method handles all commands and responses, you can use this
+	 * directly or the quick method wrappers below.
+	 * 
+	 * @todo rewrite this to use func_get_args (or whatever that function is called)
+	 * 
+	 * @param string $method 
+	 * The method (command) string
+	 * 
+	 * @param string $arg1 
+	 * The first argument
+	 * 
+	 * @param string $arg2 
+	 * The second argument
+	 * 
+	 * @return string
+	 * The response
+	 */
+	public function send($method, $arg1="", $arg2="")
+	{
+		// format the comm
+		if($arg1 != "" && $arg2 != "")
+		{
+			$command = "$method \"$arg1\" \"$arg2\"";
+		}
+		elseif($arg1 != "") {
+			$command = "$method \"$arg1\"";
+		}
+		else {
+			$command = $method;
+		}
 
-    Extend this to make your own quick method wrappers
-    e.g.
+		// send the command to the server
+		fputs($this->fp,"$command\n");
 
-    public function status() {
-        return $this->send("status",""); // second parameter null as status requires no args
-    }
+		// keep looping while we're getting data
+		while(!feof($this->fp)) {
+			// get a line of data
+			$got =  fgets($this->fp,1024);
 
+			// is the "OK" message? if so, leave the loop
+			if(strncmp("OK", $got, strlen("OK"))==0)
+				break;
 
+			// is the "ACK" (error) message? if so, leave the loop
+			if(strncmp("ACK", $got, strlen("ACK"))==0)
+				break;
 
-    */
+			// add whatever we got from the server to our list of strings
+			$ret[]=$got;
+		}
 
-    public function add($string) {
-        return $this->send("add",$string);
-    }
+		// build a response array
+		$sentResponse = array(
+			"response" => $this->response,
+			// @todo why is this here? it's just the last line of the response
+			"got" => $got,
+			"ret" => $ret
+		);
 
-    public function status() {
-        return $this->send("status"); // no second parameter null as status requires no args
-    }
+		// return the response
+		return $sentResponse;
+	}
 
-    public function clear() {
-        return $this->send("clear");
-    }
+	/**
+	 * Add a resource to the playlist
+	 *
+	 * @param string $string 
+	 * The item to add
+	 *
+	 * @return array
+	 * The response from the server
+	 */
+	public function add($string) {
+		return $this->send("add",$string);
+	}
 
-    public function currentSong() {
-        return $this->send("currentsong");
-    }
+	/**
+	 * Request the server status
+	 *
+	 * @return array
+	 * The response from the server
+	 */
+	public function status() {
+		return $this->send("status");
+	}
 
-    public function move($from,$to) {
-        return $this->send("move", $from,$to);
-    }
+	/**
+	 * Clear the current playlist
+	 * 
+	 * @return array
+	 * The response from the server
+	 */
+	public function clear() {
+		return $this->send("clear");
+	}
+
+	/**
+	 * Get the current song info
+	 * 
+	 * @return array
+	 * The response from the server
+	 */
+	public function currentSong() {
+		return $this->send("currentsong");
+	}
+
+	/**
+	 * Move a song within the current playlist
+	 * 
+	 * @param string $from
+	 * The Song ID of the song to move
+	 * 
+	 * @param string $to 
+	 * The playlist position to move to
+	 * 
+	 * @return array
+	 * The response from the server
+	 */
+	public function move($from,$to) {
+		return $this->send("move", $from,$to);
+	}
 }
