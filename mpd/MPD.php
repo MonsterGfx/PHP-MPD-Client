@@ -120,19 +120,7 @@ class MPD {
 	 * @return string
 	 * The response
 	 */
-	public static function send($method, $arg1="", $arg2="")
 	{
-		// format the command
-		if($arg1 != "" && $arg2 != "")
-		{
-			$command = "$method \"$arg1\" \"$arg2\"";
-		}
-		elseif($arg1 != "") {
-			$command = "$method \"$arg1\"";
-		}
-		else {
-			$command = $method;
-		}
 
 		// send the command to the server
 		fputs(static::$fp, "$command\n");
