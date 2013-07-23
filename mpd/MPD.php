@@ -376,6 +376,8 @@ class MPDConnectionFailedException extends \Exception {};
 
 class MPDLoginFailedException extends \Exception {};
 
+class MPDInvalidArgumentException extends \Exception {};
+
 
 
 
