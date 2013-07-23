@@ -105,4 +105,85 @@ class SimpleMPDWrapper {
     public function move($from,$to) {
         return $this->send("move", $from,$to);
     }
+	/**
+	 * The file pointer used for accessing the server
+	 */
+	/**
+	 * The response
+	 */
+	/**
+	 * Construct the MPD wrapper object
+	 *
+	 * @param string $pass 
+	 * The password for the MPD server
+	 *
+	 * @param string $host 
+	 * The host name or IP address of the server
+	 *
+	 * @param int $port 
+	 * The port number via which to connect to the server
+	 *
+	 * @param int $refresh 
+	 * It is not known what this is supposed to be. It's not referenced in the
+	 * code below.
+	 */
+	/**
+	 * Send a command to the server
+	 *
+	 * Our send method handles all commands and responses, you can use this
+	 * directly or the quick method wrappers below.
+	 * 
+	 * @todo rewrite this to use func_get_args (or whatever that function is called)
+	 * 
+	 * @param string $method 
+	 * The method (command) string
+	 * 
+	 * @param string $arg1 
+	 * The first argument
+	 * 
+	 * @param string $arg2 
+	 * The second argument
+	 * 
+	 * @return string
+	 * The response
+	 */
+	/**
+	 * Add a resource to the playlist
+	 *
+	 * @param string $string 
+	 * The item to add
+	 *
+	 * @return array
+	 * The response from the server
+	 */
+	/**
+	 * Request the server status
+	 *
+	 * @return array
+	 * The response from the server
+	 */
+	/**
+	 * Clear the current playlist
+	 * 
+	 * @return array
+	 * The response from the server
+	 */
+	/**
+	 * Get the current song info
+	 * 
+	 * @return array
+	 * The response from the server
+	 */
+	/**
+	 * Move a song within the current playlist
+	 * 
+	 * @param string $from
+	 * The Song ID of the song to move
+	 * 
+	 * @param string $to 
+	 * The playlist position to move to
+	 * 
+	 * @return array
+	 * The response from the server
+	 */
 }
