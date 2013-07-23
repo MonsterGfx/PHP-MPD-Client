@@ -8,6 +8,139 @@
  * Updated and revised by MonsterGfx
  */
 
+/**
+ * The MPD server interface
+ * 
+ * The following are commands to implement:
+ * 
+ * Querying MPD's status
+ * 
+ * - status - Reports the current status of the player and the volume level.
+ * - currentsong - Displays the song info of the current song (same song that is identified in status).
+ * @todo clearerror
+ * @todo idle
+ * @todo stats
+ * 
+ * 
+ * Playback options
+ * 
+ * @todo consume
+ * @todo crossfade
+ * @todo mixrampdb
+ * @todo mixrampdelay
+ * @todo random
+ * @todo repeat
+ * @todo setvol
+ * @todo single
+ * @todo replay_gain_mode
+ * @todo replay_gain_status
+ * 
+ * 
+ * Controlling playback
+ * 
+ * @todo next
+ * @todo pause
+ * @todo play
+ * @todo playid
+ * @todo previous
+ * @todo seek
+ * @todo seekid
+ * @todo seekcur
+ * @todo stop
+ * 
+ * 
+ * The current playlist
+ * 
+ * - add {URI} - Adds the file URI to the playlist (directories add recursively). URI can also be a single file.
+ * - clear - Clears the current playlist.
+ * - move [{FROM} | {START:END}] {TO} - Moves the song at FROM or range of songs at START:END to TO in the playlist.
+ * @todo addid
+ * @todo delete
+ * @todo deleteid
+ * @todo moveid
+ * @todo playlist
+ * @todo playlistfind
+ * @todo playlistid
+ * @todo playlistinfo
+ * @todo playlistsearch
+ * @todo plchanges
+ * @todo plchangesposid
+ * @todo prio
+ * @todo prioid
+ * @todo shuffle
+ * @todo swap
+ * @todo swapid
+ * 
+ * 
+ * Stored playlists
+ * 
+ * @todo listplaylist
+ * @todo listplaylistinfo
+ * @todo listplaylists
+ * @todo load
+ * @todo playlistadd
+ * @todo playlistclear
+ * @todo playlistdelete
+ * @todo playlistmove
+ * @todo rename
+ * @todo rm
+ * @todo save
+ * 
+ * The music database
+ * 
+ * @todo count
+ * @todo find
+ * @todo findadd
+ * @todo list
+ * @todo listall
+ * @todo listallinfo
+ * @todo lsinfo
+ * @todo search
+ * @todo searchadd
+ * @todo searchaddpl
+ * @todo update
+ * @todo rescan
+ * 
+ * 
+ * Stickers
+ * 
+ * @todo sticker
+ * 
+ * 
+ * Connection settings
+ * 
+ * @todo close
+ * @todo kill
+ * @todo password
+ * @todo ping
+ * 
+ * 
+ * Audio output devices
+ * 
+ * @todo disableoutput
+ * @todo enableoutput
+ * @todo outputs
+ * 
+ * 
+ * Reflection
+ * 
+ * @todo config
+ * @todo commands
+ * @todo notcommands
+ * @todo tagtypes
+ * @todo urlhandlers
+ * @todo decoders
+ * 
+ * 
+ * Client to client
+ * 
+ * @todo subscribe
+ * @todo unsubscribe
+ * @todo channels
+ * @todo readmessages
+ * @todo sendmessage
+ * 
+ */
 class MPD {
 
 	/**
