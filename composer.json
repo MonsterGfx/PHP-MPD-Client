@@ -15,8 +15,8 @@
         "raveren/kint": "dev-master"
     },
     "autoload": {
-        "psr-0": {
-            "MPDWrapper": ""
-        }
+        "classmap": [
+            "mpd"
+        ]
     }
 }
