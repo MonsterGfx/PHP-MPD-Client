@@ -228,4 +228,12 @@ class MPD {
 }
 
 
-}
+class MPDConnectionFailedException extends \Exception {};
+
+class MPDLoginFailedException extends \Exception {};
+
+
+
+
+
+
