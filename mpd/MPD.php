@@ -108,8 +108,6 @@ class MPD {
 	 * Our send method handles all commands and responses, you can use this
 	 * directly or the quick method wrappers below.
 	 * 
-	 * @todo rewrite this to use func_get_args (or whatever that function is called)
-	 * 
 	 * @param string $method 
 	 * The method (command) string
 	 * 
