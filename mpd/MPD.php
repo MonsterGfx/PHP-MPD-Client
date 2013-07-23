@@ -221,7 +221,7 @@ class MPD {
 
 				// is it an "ACK" (error) message? if so, the login failed
 				if(strncmp("ACK",$got,strlen("ACK"))==0)
-					throw new MPDLoginFailedException("Unable to log in. Incorrect password?");
+					throw new MPDLoginFailedException();
 			}
 		}
 	}
