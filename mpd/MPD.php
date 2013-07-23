@@ -172,7 +172,7 @@ class MPD {
 	public static function connect($pass = "", $host = "", $port = 6600, $refresh = 0)
 	{
 		// open the connection to the server
-		static::$fp = fsockopen($host, $port, $errno, $errstr, 30); //Connect-String
+		static::$fp = fsockopen($host, $port, $errno, $errstr, 30);
 
 		// check to see if we successfully connected
 		if(!static::$fp) {
