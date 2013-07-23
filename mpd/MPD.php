@@ -311,6 +311,7 @@ class MPD {
 	 * The response from the server
 	 */
 	public static function add($string) {
+		// @todo validation of parameters
 		return static::send("add",$string);
 	}
 
@@ -365,7 +366,8 @@ class MPD {
 	 * The response from the server
 	 */
 	public static function move($from,$to) {
-		return static::send("move", $from,$to);
+		// @todo validation of parameters
+		return static::send("move", $from, $to);
 	}
 }
 
