@@ -1,17 +1,15 @@
 {
-    "name": "mutantlabs/simplempd",
-    "description": "Simple PHP Wrapper for MDP is a PHP class for interfacing with the MPD Music Daemon. It allows you to develop an API to interface with MPD",
-    "keywords": ["MPD","Mopidy","REST", "RESTful", "php", "API"],
+    "name": "monstergfx/php-mpd-client",
+    "description": "PHP-MPD-Client is a PHP client class for MPD.",
+    "keywords": ["MPD","php"],
     "license": "MIT",
     "authors": [
         {
-            "name": "Mutant Labs",
-            "email": "info@mutantlabs.com",
-            "homepage": "http://mutantlabs.com"
+            "name": "Dave Thomas",
+            "email": "info@monstergfx.com"
         }
     ],
     "require": {
-        "marcj/php-rest-service": "*"
     },
     "autoload": {
         "psr-0": {
