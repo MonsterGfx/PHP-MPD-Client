@@ -4,23 +4,8 @@
  * User: mijahn
  * Date: 31/05/13
  * Time: 11:44
- * To change this template use File | Settings | File Templates.
  */
 
-/*
-    SimpleMPDWrapper Class useage
-
-    // Construct a new PocketMp instance
-    // Required parameters: Password, MPD Server address, Port, Refresh interval
-    $mp = new PocketMP("","192.168.0.1",6600,0);
-
-    // Send a command using the send method:
-    echo json_encode($mp->send("add", "spotify:track:48mZ0CGCffjH49h5lAPTIe"));
-
-    // Or utilise the quick method wrappers
-    echo json_encode($mp->add("spotify:track:48mZ0CGCffjH49h5lAPTIe"));
-
-*/
 namespace MPDWrapper;
 
 class SimpleMPDWrapper {
@@ -62,9 +47,6 @@ class SimpleMPDWrapper {
 
     }
 
-    /*
-     Our send method handles all commands and responses, you can use this directly or the quick method wrappers below
-    */
 
     public function send($method,$arg1="",$arg2="") {
 
@@ -103,27 +85,6 @@ class SimpleMPDWrapper {
 
     }
 
-    /*
-    Quick method wrappers
-
-    // Construct a new PocketMp instance
-    // Required parameters: Password, MPD Server address, Port, Refresh interval
-    $mp = new PocketMP("","192.168.0.1",6600,0);
-
-    // Call a quick method
-
-    echo json_encode($mp->add("spotify:track:48mZ0CGCffjH49h5lAPTIe"));
-
-    Extend this to make your own quick method wrappers
-    e.g.
-
-    public function status() {
-        return $this->send("status",""); // second parameter null as status requires no args
-    }
-
-
-
-    */
 
     public function add($string) {
         return $this->send("add",$string);
