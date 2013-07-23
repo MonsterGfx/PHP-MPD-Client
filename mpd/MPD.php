@@ -365,8 +365,20 @@ class MPD {
 	 * @return array
 	 * The response from the server
 	 */
-	public static function move($from,$to) {
-		// @todo validation of parameters
+	public static function move($from, $to)
+	{
+		// validation
+
+		// $from must be either a single integer value (a playlist position) or
+		// a string describing a range (two integers separated by ':')
+		if(!preg_match('/^([0-9]+|[0-9]+\:[0-9]+)$/', trim($from)))
+			throw new MPDInvalidArgumentException("Move: invalid FROM value: $from");
+
+		// $to must be a single integer value
+		if(!is_numeric($to) || $to<0)
+			throw new MPDInvalidArgumentException("Move: invalid TO value: $to");
+
+		// send the command
 		return static::send("move", $from, $to);
 	}
 }
