@@ -8,6 +8,6 @@ use PHPMPDClient\MPD AS mpd;
 
 mpd::connect('', 'localhost');
 
-Kint::dump(mpd::status());
+Kint::dump(mpd::currentsong());
 
 mpd::disconnect();

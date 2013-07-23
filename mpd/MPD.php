@@ -108,8 +108,6 @@ class MPD {
 	 * Our send method handles all commands and responses, you can use this
 	 * directly or the quick method wrappers below.
 	 * 
-	 * @todo rewrite this to use func_get_args (or whatever that function is called)
-	 * 
 	 * @param string $method 
 	 * The method (command) string
 	 * 
@@ -122,19 +120,19 @@ class MPD {
 	 * @return string
 	 * The response
 	 */
-	public static function send($method, $arg1="", $arg2="")
+	public static function send()
 	{
-		// format the command
-		if($arg1 != "" && $arg2 != "")
-		{
-			$command = "$method \"$arg1\" \"$arg2\"";
-		}
-		elseif($arg1 != "") {
-			$command = "$method \"$arg1\"";
-		}
-		else {
-			$command = $method;
-		}
+		// get the arguments
+		$args = func_get_args();
+
+		// the first argument is the method
+		$method = array_shift($args);
+
+		// wrap the remaining arguments in double quotes
+		array_walk($args, function(&$value, $key){ $value = '"'.$value.'"'; });
+
+		// build the command string
+		$command = trim($method.' '.implode(' ',$args));
 
 		// send the command to the server
 		fputs(static::$fp, "$command\n");
