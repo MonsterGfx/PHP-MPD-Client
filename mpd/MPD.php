@@ -175,7 +175,8 @@ class MPD {
 		static::$fp = fsockopen($host, $port, $errno, $errstr, 30);
 
 		// check to see if we successfully connected
-		if(!static::$fp) {
+		if(!static::$fp)
+		{
 			// no connection
 			throw new MPDConnectionFailedException("$errstr ($errno)");
 		}
@@ -271,7 +272,8 @@ class MPD {
 		fputs(static::$fp, "$command\n");
 
 		// keep looping while we're getting data
-		while(!feof(static::$fp)) {
+		while(!feof(static::$fp))
+		{
 			// get a line of data
 			$got =  fgets(static::$fp, 1024);
 
@@ -323,7 +325,8 @@ class MPD {
 	 * @return array
 	 * The response from the server
 	 */
-	public static function status() {
+	public static function status()
+	{
 		return static::send("status");
 	}
 
@@ -333,7 +336,8 @@ class MPD {
 	 * @return array
 	 * The response from the server
 	 */
-	public static function clear() {
+	public static function clear()
+	{
 		return static::send("clear");
 	}
 
@@ -346,7 +350,8 @@ class MPD {
 	 * @return array
 	 * The response from the server
 	 */
-	public static function currentSong() {
+	public static function currentSong()
+	{
 		return static::send("currentsong");
 	}
 
