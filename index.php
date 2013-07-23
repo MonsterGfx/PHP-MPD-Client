@@ -4,7 +4,7 @@ require_once "./vendor/autoload.php";
 
 // instantiate a connection
 
-$mpd = new MPDWrapper\SimpleMPDWrapper('', 'localhost');
+$mpd = new PHPMPDClient\MPD('', 'localhost');
 
 Kint::dump($mpd);
 
