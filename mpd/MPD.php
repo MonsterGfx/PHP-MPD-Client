@@ -300,7 +300,10 @@ class MPD {
 
 	/**
 	 * Add a resource to the playlist
-	 *
+	 * 
+	 * add {URI} - Adds the file URI to the playlist (directories add
+	 * recursively). URI can also be a single file.
+	 * 
 	 * @param string $string 
 	 * The item to add
 	 *
@@ -313,7 +316,9 @@ class MPD {
 
 	/**
 	 * Request the server status
-	 *
+	 * 
+	 * Reports the current status of the player and the volume level.
+	 * 
 	 * @return array
 	 * The response from the server
 	 */
@@ -334,6 +339,9 @@ class MPD {
 	/**
 	 * Get the current song info
 	 * 
+	 * Displays the song info of the current song (same song that is identified
+	 * in status).
+	 * 
 	 * @return array
 	 * The response from the server
 	 */
@@ -343,6 +351,9 @@ class MPD {
 
 	/**
 	 * Move a song within the current playlist
+	 * 
+	 * move [{FROM} | {START:END}] {TO} - Moves the song at FROM or range of
+	 * songs at START:END to TO in the playlist.
 	 * 
 	 * @param string $from
 	 * The Song ID of the song to move
