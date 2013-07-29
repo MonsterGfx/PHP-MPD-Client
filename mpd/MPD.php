@@ -285,6 +285,11 @@ class MPD {
 		// the first argument is the method
 		$method = array_shift($args);
 
+		// now I want to handle any arrays in the arguments & build a single,
+		// non-associative array of arguments whose elements are all scalar
+		// values
+		$args = static::condense($args);
+
 		// wrap the remaining arguments in double quotes
 		array_walk($args, function(&$value, $key){ $value = '"'.$value.'"'; });
 
