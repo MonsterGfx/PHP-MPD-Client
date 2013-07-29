@@ -237,6 +237,29 @@ class MPD {
 	}
 
 	/**
+	 * "Condense" an array to a single non-associative array of scalar values.
+	 * 
+	 * @param array $arr 
+	 * @return array
+	 */
+	private static function condense($arr)
+	{
+		$result = array();
+		foreach(array_values($arr) as $a)
+		{
+			if(is_scalar($a))
+				$result[] = $a;
+			elseif(is_array($a))
+				$result = array_merge($result, static::condense($a));
+			elseif(is_object($a))
+				$result = array_merge($result, static::condense((array)$a));
+			else
+				throw new Exception("Unrecognized object type");
+		}
+		return $result;
+	}
+
+	/**
 	 * Send a command to the server
 	 *
 	 * Our send method handles all commands and responses, you can use this
@@ -261,6 +284,11 @@ class MPD {
 
 		// the first argument is the method
 		$method = array_shift($args);
+
+		// now I want to handle any arrays in the arguments & build a single,
+		// non-associative array of arguments whose elements are all scalar
+		// values
+		$args = static::condense($args);
 
 		// wrap the remaining arguments in double quotes
 		array_walk($args, function(&$value, $key){ $value = '"'.$value.'"'; });
