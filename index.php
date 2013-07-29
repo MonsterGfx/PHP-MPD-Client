@@ -6,8 +6,17 @@ use PHPMPDClient\MPD AS mpd;
 
 // instantiate a connection
 
-mpd::connect('', 'localhost');
+class test {
+	public $val1 = 7;
+	public $val8 = 8;
+	public $val9 = 9;
+	public $vala = 'a';
+}
+$sample = array(
+	1, 2, 3,
+	array(4, 5, 6),
+	new test(),
+	array( 'b', 'c', array('d','e','f'))
+);
 
-Kint::dump(mpd::currentsong());
-
-mpd::disconnect();
+Kint::dump(mpd::condense($sample));
