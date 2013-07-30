@@ -290,8 +290,13 @@ class MPD {
 		// values
 		$args = static::condense($args);
 
-		// wrap the remaining arguments in double quotes
-		array_walk($args, function(&$value, $key){ $value = '"'.$value.'"'; });
+		// wrap the remaining arguments in double quotes (escaping any quotes in
+		// the process)
+		array_walk($args, function(&$value, $key){
+			$value = str_replace('"', '\"', $value);
+			$value = str_replace("'", "\\'", $value);
+			$value = '"'.$value.'"'; 
+		});
 
 		// build the command string
 		$command = trim($method.' '.implode(' ',$args));
