@@ -304,6 +304,8 @@ class MPD {
 		// send the command to the server
 		fputs(static::$fp, "$command\n");
 
+		$ret = array();
+
 		// keep looping while we're getting data
 		while(!feof(static::$fp))
 		{
@@ -326,7 +328,7 @@ class MPD {
 		$sentResponse = array(
 			"response" => static::$response,
 			"status" => trim($got),
-			"values" => $ret
+			"values" => $ret,
 		);
 
 		// return the response
